@@ -5,7 +5,11 @@
  * @param fragmentShaderSource
  * @returns
  */
-export const createProgram = async (gl: WebGLRenderingContext, vertexShaderSource: string, fragmentShaderSource: string) => {
+export const createProgram = async (
+  gl: WebGLRenderingContext,
+  vertexShaderSource: string,
+  fragmentShaderSource: string
+) => {
   const vertexShader = gl.createShader(gl.VERTEX_SHADER);
 
   gl.shaderSource(vertexShader, vertexShaderSource);
@@ -65,6 +69,9 @@ export const bindProgram = (
     float?: {
       [key: string]: number;
     };
+    int?: {
+      [key: string]: number;
+    };
   }
 ) => {
   gl.useProgram(program);
@@ -118,6 +125,19 @@ export const bindProgram = (
       }
     }
   }
+
+  const int = uniforms?.int ?? {};
+  for (const name in int) {
+    const value = int[name];
+
+    if (value) {
+      const uniformLocation = gl.getUniformLocation(program, name);
+
+      if (uniformLocation) {
+        gl.uniform1i(uniformLocation, value);
+      }
+    }
+  }
 };
 
 /**
@@ -125,7 +145,10 @@ export const bindProgram = (
  * @param gl
  * @param data
  */
-export const createAttributeBuffer = (gl: WebGLRenderingContext, data: Float32Array) => {
+export const createAttributeBuffer = (
+  gl: WebGLRenderingContext,
+  data: Float32Array
+) => {
   const buffer = gl.createBuffer();
 
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -139,7 +162,10 @@ export const createAttributeBuffer = (gl: WebGLRenderingContext, data: Float32Ar
  * @param gl
  * @param data
  */
-export const createIndicesBuffer = (gl: WebGLRenderingContext, data: Uint16Array) => {
+export const createIndicesBuffer = (
+  gl: WebGLRenderingContext,
+  data: Uint16Array
+) => {
   const buffer = gl.createBuffer();
 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
@@ -168,7 +194,14 @@ export const bindBuffer = (
       if (attributeLocation > -1) {
         gl.bindBuffer(gl.ARRAY_BUFFER, params.buffer);
         gl.enableVertexAttribArray(attributeLocation);
-        gl.vertexAttribPointer(attributeLocation, params.size, params.type, false, params.stride ?? 0, params.offset ?? 0);
+        gl.vertexAttribPointer(
+          attributeLocation,
+          params.size,
+          params.type,
+          false,
+          params.stride ?? 0,
+          params.offset ?? 0
+        );
       }
     }
   }
@@ -177,11 +210,26 @@ export const bindBuffer = (
   // gl.vertexAttribPointer(positionLoc, 3, gl.FLOAT, false, 0, 0);
 };
 
-export const createTexture = (gl: WebGLRenderingContext, width: number, height: number, data: Uint8Array) => {
+export const createTexture = (
+  gl: WebGLRenderingContext,
+  width: number,
+  height: number,
+  data: Uint8Array
+) => {
   const texture = gl.createTexture();
 
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.UNSIGNED_BYTE, data);
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    0,
+    gl.RGB,
+    width,
+    height,
+    0,
+    gl.RGB,
+    gl.UNSIGNED_BYTE,
+    data
+  );
 
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
