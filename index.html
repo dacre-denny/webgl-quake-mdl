@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        font-family: monospace;
+        color: red;
+      }
+
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      h1, div {
+        position: relative;
+        z-index: 1;
+      }
+
+      .group {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        margin:1.5rem 0;
+      }
+
+      .group > label {
+        width: 5rem;
+      }
+      .radio {
+        position: relative;
+      }
+      .radio input {
+        display: none;
+      }
+      .radio input:checked + label {
+        background-color: blue;
+      }
+      .radio label {
+        background-color: red;
+        border-radius: 0.15rem;
+        padding: 0.25rem;
+        color: wheat;
+      }
+
+      .status {
+        background-color: red;
+          color:black;
+          z-index: 1;
+          top:1rem;
+          right:1rem;
+
+          position: fixed;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Quake 1 MDL Viewer</h1>
+
+    <div class="status">Loading .. Opps, something went wrong</div>
+
+    <div>
+      <label>Model</label>
+      
+      <div>
+          Ogre <button>X</button>
+      </div>
+
+      <div class="group">
+        <label>Skin</label>
+        <select></select>
+      </div>
+
+      <div class="group">
+        <label>Animation</label>
+        <select></select>
+      </div>
+
+      <div class="group">
+        <label>Speed</label>
+        <div class="radio">
+          <input id="anim-speed-.1x" type="radio" name="anim-speed" value="0.05" />
+          <label for="anim-speed-.1x">1/20x</label>
+        </div>
+        <div class="radio">
+          <input id="anim-speed-.5x" type="radio" checked name="anim-speed" value="0.15" />
+          <label for="anim-speed-.5x">3/20x</label>
+        </div>
+        <div class="radio">
+          <input id="anim-speed-1x" type="radio" name="anim-speed" value="1" />
+          <label for="anim-speed-1x">1x</label>
+        </div>
+        <div class="radio">
+          <input id="anim-speed-2x" type="radio"  name="anim-speed" value="2" />
+          <label for="anim-speed-2x">2x</label>
+        </div>
+        
+      </div>
+
+      <div class="group">
+        <label>Smooth</label>
+        <div class="radio">
+          <input id="anim-smooth-on" type="radio" checked name="anim-smooth" value="true" />
+          <label for="anim-smooth-on">On</label>
+        </div>
+        <div class="radio">
+          <input id="anim-smooth-off" type="radio" name="anim-smooth" value="false" />
+          <label for="anim-smooth-off">Off</label>
+        </div>
+      </div>
+    </div>
+    <div>
+      <label>Rendering</label>
+      
+      <div class="group">
+        <label>Camera</label>
+        <div class="radio">
+          <input id="camera-orbit" type="radio" name="camera" value="orbit" />
+          <label for="camera-orbit">Orbit</label>
+        </div>
+        <div class="radio">
+          <input id="camera-rotate" type="radio" name="camera" value="rotate" />
+          <label for="camera-rotate">Rotate</label>
+        </div>
+        <div class="radio">
+          <input id="camera-fixed" type="radio" name="camera" value="fixed" />
+          <label for="camera-fixed">Fixed</label>
+        </div>
+      </div>
+
+      <div class="group">
+        <label>Shading</label>
+        <div class="radio">
+          <input id="camera-orbit" type="radio" name="camera" value="orbit" />
+          <label for="camera-orbit">Points</label>
+        </div>
+        <div class="radio">
+          <input id="camera-rotate" type="radio" name="camera" value="rotate" />
+          <label for="camera-rotate">Normals</label>
+        </div>
+        <div class="radio">
+          <input id="camera-fixed" type="radio" name="camera" value="fixed" />
+          <label for="camera-fixed">Texture</label>
+        </div>
+        <div class="radio">
+          <input id="camera-fixed" type="radio" name="camera" value="fixed" />
+          <label for="camera-fixed">Lighting</label>
+        </div>
+        <div class="radio">
+          <input id="camera-fixed" type="radio" name="camera" value="fixed" />
+          <label for="camera-fixed">Combined</label>
+        </div>
+      </div>
+      
+      <div class="group">
+        <label>Resolution</label>
+        <div class="radio">
+          <input id="camera-orbit" type="radio" name="camera" value="orbit" />
+          <label for="camera-orbit">1/2x</label>
+        </div>
+        <div class="radio">
+          <input id="camera-rotate" type="radio" name="camera" value="rotate" />
+          <label for="camera-rotate">1x</label>
+        </div>
+      </div>
+
+      <div class="group">
+        <label>Mode</label>
+        <div class="radio">
+          <input id="mode-playback" type="radio" name="mode" value="playback" />
+          <label for="mode-playback">Playback</label>
+        </div>
+        <div class="radio">
+          <input id="mode-game" type="radio" name="mode" value="game"/>
+          <label for="mode-game">Game</label>
+        </div>
+      </div>
+
+      
+    </div>
+    <canvas></canvas>
+  </body>
+</html>
