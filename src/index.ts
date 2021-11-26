@@ -43,6 +43,7 @@ const SHADER_FS = `
 precision mediump float;
 
 uniform sampler2D u_texture;
+uniform int u_shading;
 
 varying vec4 v_position;
 varying vec3 v_normal;
@@ -57,9 +58,19 @@ void main() {
 
   vec4 l_color = vec4(l_amount, l_amount, l_amount, 1.0);
 
+  if(u_shading == 0) {
+
+    gl_FragColor = texture2D(u_texture, v_uv) * l_color;
+  }
+  else if(u_shading == 1) {
+
+    gl_FragColor = texture2D(u_texture, v_uv);
+  }
+  else {
+    gl_FragColor = vec4(v_normal * 0.5 + 0.5, 1.0);
+  }
   //gl_FragColor = vec4(v_uv.x,v_uv.y, 0.0, 1.0);
-  gl_FragColor = texture2D(u_texture, v_uv) * l_color;
-  gl_FragColor =   l_color;
+  // gl_FragColor =   l_color;
   // gl_FragColor.xyz = v_normal.xyz;
 }`;
 
@@ -212,6 +223,9 @@ void main() {
         matrix4: {
           u_viewProjection: viewProjection,
           u_world: world,
+        },
+        int: {
+          u_shading: 2,
         },
         float: {
           u_frac: frac,
