@@ -5,7 +5,7 @@
  * @param fragmentShaderSource
  * @returns
  */
-export const createProgram = async (
+export const createProgram = (
   gl: WebGLRenderingContext,
   vertexShaderSource: string,
   fragmentShaderSource: string
@@ -42,6 +42,124 @@ export const createProgram = async (
   }
 
   return program;
+};
+
+/**
+ *
+ * @param gl
+ * @param data
+ */
+export const createAttributeBuffer = (
+  gl: WebGLRenderingContext,
+  data: Float32Array
+) => {
+  const buffer = gl.createBuffer();
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+
+  return buffer;
+};
+
+/**
+ *
+ * @param gl
+ * @param data
+ */
+export const createIndicesBuffer = (
+  gl: WebGLRenderingContext,
+  data: Uint16Array
+) => {
+  const buffer = gl.createBuffer();
+
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
+
+  return buffer;
+};
+
+/**
+ *
+ * @param gl
+ * @param width
+ * @param height
+ * @param data
+ * @returns
+ */
+export const createTexture = (
+  gl: WebGLRenderingContext,
+  width: number,
+  height: number,
+  data: Uint8Array
+) => {
+  const texture = gl.createTexture();
+
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    0,
+    gl.RGB,
+    width,
+    height,
+    0,
+    gl.RGB,
+    gl.UNSIGNED_BYTE,
+    data
+  );
+
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+  return texture;
+};
+
+/**
+ *
+ * @param gl
+ * @param program
+ */
+export const deleteProgram = (
+  gl: WebGLRenderingContext,
+  program: WebGLProgram
+) => {
+  if (program) {
+    gl.useProgram(program);
+
+    for (const shader of gl.getAttachedShaders(program)) {
+      gl.deleteShader(shader);
+    }
+
+    gl.deleteProgram(program);
+  }
+};
+
+/**
+ *
+ * @param gl
+ * @param texture
+ */
+export const deleteTexture = (
+  gl: WebGLRenderingContext,
+  texture: WebGLTexture
+) => {
+  if (texture) {
+    gl.deleteTexture(texture);
+  }
+};
+
+/**
+ *
+ * @param gl
+ * @param buffer
+ */
+export const deleteBuffer = (
+  gl: WebGLRenderingContext,
+  buffer: WebGLBuffer
+) => {
+  if (buffer) {
+    gl.deleteBuffer(buffer);
+  }
 };
 
 /**
@@ -117,7 +235,7 @@ export const bindProgram = (
   for (const name in float) {
     const value = float[name];
 
-    if (value) {
+    if (typeof value === "number") {
       const uniformLocation = gl.getUniformLocation(program, name);
 
       if (uniformLocation) {
@@ -130,7 +248,7 @@ export const bindProgram = (
   for (const name in int) {
     const value = int[name];
 
-    if (value) {
+    if (value !== undefined) {
       const uniformLocation = gl.getUniformLocation(program, name);
 
       if (uniformLocation) {
@@ -143,37 +261,9 @@ export const bindProgram = (
 /**
  *
  * @param gl
- * @param data
+ * @param program
+ * @param attributes
  */
-export const createAttributeBuffer = (
-  gl: WebGLRenderingContext,
-  data: Float32Array
-) => {
-  const buffer = gl.createBuffer();
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-
-  return buffer;
-};
-
-/**
- *
- * @param gl
- * @param data
- */
-export const createIndicesBuffer = (
-  gl: WebGLRenderingContext,
-  data: Uint16Array
-) => {
-  const buffer = gl.createBuffer();
-
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
-
-  return buffer;
-};
-
 export const bindBuffer = (
   gl: WebGLRenderingContext,
   program: WebGLProgram,
@@ -208,32 +298,4 @@ export const bindBuffer = (
 
   // gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   // gl.vertexAttribPointer(positionLoc, 3, gl.FLOAT, false, 0, 0);
-};
-
-export const createTexture = (
-  gl: WebGLRenderingContext,
-  width: number,
-  height: number,
-  data: Uint8Array
-) => {
-  const texture = gl.createTexture();
-
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGB,
-    width,
-    height,
-    0,
-    gl.RGB,
-    gl.UNSIGNED_BYTE,
-    data
-  );
-
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-
-  return texture;
 };
