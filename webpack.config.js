@@ -14,7 +14,11 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 loader: 'ts-loader'
-            }
+            }, 
+            {
+                test: /\.[fv]s$/i,
+                loader: 'raw-loader',
+            },
         ]
     },
     devServer: {
@@ -22,13 +26,13 @@ module.exports = {
         
     },
     resolve: {
-        extensions: [ '.ts', '.tsx', '.js' ],
+        extensions: [ '.ts', '.tsx', '.js', '.vs' ],
         fallback : {
             buffer: require.resolve('buffer'),
         }
     },
     plugins: [new HtmlWebpackPlugin({
-        title : 'webgl-mdlviewer',
+        title : 'webgl-quake-mdl',
         template: 'index.html'
     })]
 };
