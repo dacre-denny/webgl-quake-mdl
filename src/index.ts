@@ -29,6 +29,7 @@ const m4 = require("gl-mat4");
 const DEFAULT_FILE = "soldier.mdl";
 const RENDER_RESOLUTION = 1000;
 const RENDER_FOV = 1.2;
+const CAMERA_SPIN_FACTOR = 0.001;
 
 enum OptionsRenderCamera {
   Spin = "Spin",
@@ -62,7 +63,7 @@ enum OptionsRenderResolution {
   try {
     const state = {
       animationCurrent: null,
-      animationSpeed: 1,
+      animationSpeed: 10,
       animationInterpolate: true,
       modelSkin: null,
       modelFile: null,
@@ -165,7 +166,7 @@ enum OptionsRenderResolution {
           const u_world =
             state.renderCamera === OptionsRenderCamera.Fixed
               ? m4.identity([])
-              : m4.fromYRotation([], duration);
+              : m4.fromYRotation([], timeNext * CAMERA_SPIN_FACTOR);
           const u_viewProjection = m4.multiply([], projection, view);
           const u_shading =
             state.renderShading === OptionsRenderShading.Texture
