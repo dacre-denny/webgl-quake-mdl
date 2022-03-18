@@ -1,7 +1,7 @@
 import { ArrayReader } from "./ArrayReader";
 import { Colors } from "./colors";
 import { Normals } from "./normals";
-import { MdlFrame } from "./types";
+import { MdlFile, MdlFrame } from "./types";
 
 const SIZE_BYTES_VERTEX = Uint8Array.BYTES_PER_ELEMENT * 4;
 const FRAME_TYPE_SIMPLE = 0;
@@ -48,11 +48,11 @@ const readHeader = (file: ArrayReader) => {
   const version = part0[1];
 
   if (ident !== 1330660425) {
-    throw new Error(`Invalid ident`);
+    throw new Error(`Invalid MDL identity`);
   }
 
   if (version !== 6) {
-    throw new Error(`Invalid version`);
+    throw new Error(`Unsupported MDL version`);
   }
 
   const sx = part1.at(0);
@@ -231,5 +231,5 @@ export const loadMdl = async (file: ArrayReader) => {
       numTriangles,
       numVertices,
     },
-  };
+  } as MdlFile;
 };
