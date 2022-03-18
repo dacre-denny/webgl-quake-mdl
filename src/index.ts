@@ -5,10 +5,10 @@ import {
   UiRadioGroup,
   UiSelect,
   UiStatus,
-} from "./components";
+} from "./ui";
 import { ArrayReader } from "./mdl/ArrayReader";
 import { fileFromPath } from "./files";
-import { loadMdl } from "./mdl/loader";
+import { loadMdl } from "./mdl";
 import {
   bindBuffer,
   bindProgram,
@@ -22,7 +22,7 @@ import {
 import SHADER_FS from "./shaders/mesh.fs";
 import SHADER_VS from "./shaders/mesh.vs";
 import { buildFrameDeltas, extractAnimationsFromFrames } from "./mdl/helpers";
-import { MdlAnimation } from "./mdl/types";
+import { MdlAnimation, MdlFile } from "./mdl/types";
 
 const m4 = require("gl-mat4");
 
@@ -57,6 +57,8 @@ enum OptionsRenderResolution {
     UiStatus.Update("status", `⚠️ ${error?.message ?? "Something went wrong"}`);
   };
 
+  let releaseScene: (() => void) | undefined;
+
   try {
     const state = {
       animationCurrent: null,
@@ -70,122 +72,28 @@ enum OptionsRenderResolution {
       renderMode: OptionsRenderMode.Triangles,
     };
 
-    // Setup UI
+    // Rendering and file logic
 
-    UiDropZone.Bind("file", "Drop MDL file to display", async (event) => {
-      releaseScene?.();
+    const loadFile = async (file: File) => {
+      try {
+        UiStatus.Update("status", `Loading..`);
 
-      const files = Array.from(event.dataTransfer.files);
-      const [file] = files;
+        const arrayBuffer = await file.arrayBuffer();
+        const arrayReader = new ArrayReader(arrayBuffer);
 
-      if (file) {
-        releaseScene = await createScene(file);
+        const mdl = await loadMdl(arrayReader);
+
+        releaseScene?.();
+        releaseScene = createScene(mdl);
+
+        UiFilePicker.Update("model-file", file);
+        UiStatus.Update("status", null);
+      } catch (error) {
+        handleError(error);
       }
-    });
+    };
 
-    UiRadioGroup.Bind(
-      "animation-speed",
-      [
-        { label: "1/2x", value: "0.5" },
-        { label: "1x", value: "1" },
-        { label: "10x", value: "10" },
-        { label: "20x", value: "20" },
-      ],
-      (item) => {
-        state.animationSpeed = Number.parseFloat(item.value);
-      },
-      `${state.animationSpeed}`
-    );
-
-    UiRadioGroup.Bind(
-      "animation-smooth",
-      [
-        { label: "On", value: "true" },
-        { label: "Off", value: "false" },
-      ],
-      (item) => {
-        state.animationInterpolate = item.value === "true";
-      },
-      `${state.animationInterpolate}`
-    );
-
-    UiRadioGroup.Bind(
-      "render-mode",
-      [
-        { label: "Triangles", value: OptionsRenderMode.Triangles },
-        { label: "Points", value: OptionsRenderMode.Points },
-      ],
-      (item) => {
-        state.renderMode = item.value;
-      },
-      `${state.renderMode}`
-    );
-
-    UiRadioGroup.Bind(
-      "render-shading",
-      [
-        { label: "Solid", value: OptionsRenderShading.Solid },
-        { label: "Normals", value: OptionsRenderShading.Normals },
-        { label: "Texture", value: OptionsRenderShading.Texture },
-        { label: "Lighting", value: OptionsRenderShading.Lighting },
-      ],
-      (item) => {
-        state.renderShading = item.value;
-      },
-      `${state.renderShading}`
-    );
-
-    UiRadioGroup.Bind(
-      "render-camera",
-      [
-        { label: "Fixed", value: OptionsRenderCamera.Fixed },
-        { label: "Spin", value: OptionsRenderCamera.Spin },
-      ],
-      (item) => {
-        state.renderCamera = item.value;
-      },
-      `${state.renderCamera}`
-    );
-
-    UiRadioGroup.Bind(
-      "render-resolution",
-      [
-        { label: "Full", value: OptionsRenderResolution.Full },
-        { label: "Half", value: OptionsRenderResolution.Half },
-      ],
-      (item) => {
-        state.renderResolutionFactor =
-          item.value === OptionsRenderResolution.Full ? 1 : 0.5;
-      },
-      state.renderResolutionFactor === 1
-        ? OptionsRenderResolution.Full
-        : OptionsRenderResolution.Half
-    );
-
-    UiFilePicker.Bind("model-file", async (file) => {
-      releaseScene?.();
-
-      if (file) {
-        releaseScene = await createScene(file);
-      }
-    });
-
-    UiSelect.Bind<MdlAnimation>("animation-current", (animation) => {
-      state.animationCurrent = animation;
-    });
-
-    UiSelect.Bind<number>("model-skin", (modelSkin) => {
-      state.modelSkin = modelSkin;
-    });
-
-    const uiCanvas = UiCanvas.Bind("canvas");
-    uiCanvas.setDimensions(RENDER_RESOLUTION, RENDER_RESOLUTION);
-
-    const gl = uiCanvas.getWebGlContext();
-
-    gl.enable(gl.DEPTH_TEST);
-
-    const createScene = async (file: File) => {
+    const createScene = (mdl: MdlFile) => {
       let normalBuffer: WebGLBuffer = null;
       let positionBuffer: WebGLBuffer = null;
       let deltaBuffer: WebGLBuffer = null;
@@ -195,15 +103,9 @@ enum OptionsRenderResolution {
 
       let time = 0;
       let duration = 0;
-      let rendering = true;
+      let isRendering = true;
 
       try {
-        UiStatus.Update("status", `Loading..`);
-
-        const arrayBuffer = await file.arrayBuffer();
-        const arrayReader = new ArrayReader(arrayBuffer);
-
-        const mdl = await loadMdl(arrayReader);
         textures = mdl.skins.map((skin) =>
           createTexture(gl, mdl.meta.skinWidth, mdl.meta.skinHeight, skin)
         );
@@ -223,7 +125,7 @@ enum OptionsRenderResolution {
         state.animationCurrent = selectedAnimation;
 
         const render = () => {
-          if (!rendering) {
+          if (!isRendering) {
             return;
           }
 
@@ -370,15 +272,13 @@ enum OptionsRenderResolution {
             value: i,
           }))
         );
-
-        UiFilePicker.Update("model-file", file);
-
-        UiStatus.Update("status", null);
-      } catch (error) {
-        handleError(error);
       } finally {
         return () => {
-          rendering = false;
+          isRendering = false;
+
+          gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
           deleteBuffer(gl, normalBuffer);
           deleteBuffer(gl, positionBuffer);
@@ -392,8 +292,119 @@ enum OptionsRenderResolution {
       }
     };
 
+    // Setup UI
+
+    UiDropZone.Bind("file", "Drop MDL file to display", async (event) => {
+      const files = Array.from(event.dataTransfer.files);
+      const [file] = files;
+
+      if (file) {
+        await loadFile(file);
+      }
+    });
+
+    UiRadioGroup.Bind(
+      "animation-speed",
+      [
+        { label: "1/2x", value: "0.5" },
+        { label: "1x", value: "1" },
+        { label: "10x", value: "10" },
+        { label: "20x", value: "20" },
+      ],
+      (item) => {
+        state.animationSpeed = Number.parseFloat(item.value);
+      },
+      `${state.animationSpeed}`
+    );
+
+    UiRadioGroup.Bind(
+      "animation-smooth",
+      [
+        { label: "On", value: "true" },
+        { label: "Off", value: "false" },
+      ],
+      (item) => {
+        state.animationInterpolate = item.value === "true";
+      },
+      `${state.animationInterpolate}`
+    );
+
+    UiRadioGroup.Bind(
+      "render-mode",
+      [
+        { label: "Triangles", value: OptionsRenderMode.Triangles },
+        { label: "Points", value: OptionsRenderMode.Points },
+      ],
+      (item) => {
+        state.renderMode = item.value;
+      },
+      `${state.renderMode}`
+    );
+
+    UiRadioGroup.Bind(
+      "render-shading",
+      [
+        { label: "Solid", value: OptionsRenderShading.Solid },
+        { label: "Normals", value: OptionsRenderShading.Normals },
+        { label: "Texture", value: OptionsRenderShading.Texture },
+        { label: "Lighting", value: OptionsRenderShading.Lighting },
+      ],
+      (item) => {
+        state.renderShading = item.value;
+      },
+      `${state.renderShading}`
+    );
+
+    UiRadioGroup.Bind(
+      "render-camera",
+      [
+        { label: "Fixed", value: OptionsRenderCamera.Fixed },
+        { label: "Spin", value: OptionsRenderCamera.Spin },
+      ],
+      (item) => {
+        state.renderCamera = item.value;
+      },
+      `${state.renderCamera}`
+    );
+
+    UiRadioGroup.Bind(
+      "render-resolution",
+      [
+        { label: "Full", value: OptionsRenderResolution.Full },
+        { label: "Half", value: OptionsRenderResolution.Half },
+      ],
+      (item) => {
+        state.renderResolutionFactor =
+          item.value === OptionsRenderResolution.Full ? 1 : 0.5;
+      },
+      state.renderResolutionFactor === 1
+        ? OptionsRenderResolution.Full
+        : OptionsRenderResolution.Half
+    );
+
+    UiFilePicker.Bind("model-file", async (file) => {
+      if (file) {
+        await loadFile(file);
+      }
+    });
+
+    UiSelect.Bind<MdlAnimation>("animation-current", (animation) => {
+      state.animationCurrent = animation;
+    });
+
+    UiSelect.Bind<number>("model-skin", (modelSkin) => {
+      state.modelSkin = modelSkin;
+    });
+
+    const uiCanvas = UiCanvas.Bind("canvas");
+    uiCanvas.setDimensions(RENDER_RESOLUTION, RENDER_RESOLUTION);
+
+    const gl = uiCanvas.getWebGlContext();
+
+    gl.enable(gl.DEPTH_TEST);
+
     const file = await fileFromPath(`/${DEFAULT_FILE}`);
-    let releaseScene = await createScene(file);
+    await loadFile(file);
   } catch (error) {
     handleError(error);
   }
