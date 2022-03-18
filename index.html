@@ -46,6 +46,12 @@
         margin: 0 0 1rem;
         font-size: 1.5rem;
       }
+
+      sub {
+        line-height:1;
+        font-style: italic;
+        color:#888;
+      }
     </style>
   </head>
   <body>
@@ -55,10 +61,12 @@
     <main>
       <h1><%= htmlWebpackPlugin.options.title %></h1>
 
-      <ui-section label="Model">
+      <ui-section open label="Model">
         <ui-field label="File">
           <ui-file-picker name="model-file"></ui-file-picker>
         </ui-field>
+        
+        <sub>Tip: You can also drag and drop files to open</sub>
 
         <ui-field label="Skin">
           <ui-dropdown name="model-skin"></ui-dropdown>
