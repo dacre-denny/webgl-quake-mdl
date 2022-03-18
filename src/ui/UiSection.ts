@@ -19,11 +19,11 @@ h4 {
 h4::before {
   content:'';
   display:block;
+  
   width:.3rem;
   height:.3rem;
-  transform: translateY(-0.05rem) rotate(-45deg);
-  
 
+  transform: translateY(-0.05rem) rotate(-45deg);
   transition: border-color 0.3s, transform 0.3s;
 
   border:.2rem solid var(--color-selected);
@@ -39,11 +39,13 @@ div {
   display:none;
 }
 
-.visible div {
-  display:block;
+.open div {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 
-.visible h4::before {
+.open h4::before {
   transform:rotate(45deg) translateY(-0.15rem);
 }
 
@@ -57,7 +59,7 @@ div {
 
   customElements.define(
     "ui-section",
-    class extends HTMLElement {
+    class UiSection extends HTMLElement {
       constructor() {
         super();
 
@@ -67,12 +69,17 @@ div {
         shadow.appendChild(element);
 
         const section = shadow.querySelector("section");
-        const div = shadow.querySelector("div");
+        section.classList.toggle("open", true);
+
+        const openTextContent = this.attributes["open"]?.textContent;
+        const open = openTextContent === "" || openTextContent === "true";
+
+        section.classList.toggle("open", open);
 
         const label = shadow.querySelector("h4");
         label.textContent = `${this.getAttribute("label") ?? ""}`;
         label.addEventListener("click", () => {
-          section.classList.toggle("visible");
+          section.classList.toggle("open");
         });
       }
     }

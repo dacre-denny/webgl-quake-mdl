@@ -31,7 +31,6 @@ export class UiCanvas extends HTMLElement {
 
     const shadow = this.attachShadow({ mode: "open" });
     const element = template.content.cloneNode(true);
-    const selector = `${this.getAttribute("target") ?? "html"}`;
 
     shadow.appendChild(element);
 
