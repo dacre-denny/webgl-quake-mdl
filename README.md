@@ -31,15 +31,17 @@ The app will usually be accessible at [localhost:8080](http://localhost:8080/) a
 
 ### Feature Demos
 
-| <img src="assets/model-dnd.gif" alt="Drag and Drop support"/> <span style="font-weight:normal;">Drag and Drop support</span> | <img src="assets/animation-select.gif" alt="Select animation for playback"/> <span style="font-weight:normal;">Select animation for playback</span> |
+|     |     |
 | --- | --- |
+| <img src="assets/model-dnd.gif" alt="Drag and Drop support"/> Drag and Drop support | <img src="assets/animation-select.gif" alt="Select animation for playback"/> Select animation for playback |
 | <img src="assets/animation-smooth.gif" alt="Toggle smooth frame interpolation"/> Toggle smooth frame interpolation | <img src="assets/render-shading.gif" alt="Select shading mode"/> Select shading mode |
 | <img src="assets/render-element.gif" alt="Select rendering primitive"/> Select rendering primitive | <img src="assets/render-camera.gif" alt="Toggle spinning camera"/> Toggle spinning camera |
 
 ## Gallery
 
-|<img src="assets/gallery-1.png" alt="Ogre"/>|<img src="assets/gallery-2.png" alt="Soldier"/>|
+|     |     |
 | --- | --- |
+|<img src="assets/gallery-1.png" alt="Ogre"/>|<img src="assets/gallery-2.png" alt="Soldier"/>|
 |<img src="assets/gallery-3.png" alt="Shambler"/>|<img src="assets/gallery-4.png" alt="Shading mode"/>|
 
 ## Notes
