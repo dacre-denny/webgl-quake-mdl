@@ -4,6 +4,10 @@
 
 When Quake came out in the 90's, who would have thought MDL assets would one day be viewable in the browser?
 
+## Demo
+
+[Try it out here](http://webgl-quake-mdl.surge.sh/)
+
 ## Quick Start
 
 ```
@@ -12,7 +16,7 @@ git clone git@github.com:dacre-denny/webgl-quake-mdl.git
 npm i && npm run dev
 ```
 
-The app will usually be accessible at [localhost:8080](http://localhost:8080/) and will attempt to automatically load `/data/soldier.mdl`. To get a copy of `soldier.mdl`, [download Quake](https://www.moddb.com/games/quake/downloads/quake-shareware-106) and [PakExplorer](https://gamebanana.com/tools/6588). Use PakExplorer to extract `soldier.mdl` from `ID1/pak0.pak` in the Quake directory.
+The app will usually be accessible at [localhost:8080](http://localhost:8080/) and will attempt to automatically load `/data/soldier.mdl`
 
 ## Features
 

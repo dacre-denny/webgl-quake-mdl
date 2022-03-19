@@ -404,7 +404,7 @@ enum OptionsRenderResolution {
 
     gl.enable(gl.DEPTH_TEST);
 
-    const file = await fileFromPath(`/${DEFAULT_FILE}`);
+    const file = await fileFromPath(`/data/${DEFAULT_FILE}`);
     await loadFile(file);
   } catch (error) {
     handleError(error);

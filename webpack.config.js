@@ -22,7 +22,7 @@ module.exports = {
         ]
     },
     devServer: {
-        contentBase: path.resolve('data'),
+        contentBase: path.resolve('.'),
         
     },
     resolve: {
