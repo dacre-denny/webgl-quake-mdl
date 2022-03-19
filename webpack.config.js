@@ -33,6 +33,6 @@ module.exports = {
     },
     plugins: [new HtmlWebpackPlugin({
         title : 'webgl-quake-mdl',
-        template: 'index.html'
+        template: './src/index.html'
     })]
 };
