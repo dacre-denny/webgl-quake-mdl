@@ -97,7 +97,8 @@ enum OptionsRenderResolution {
     const createScene = (mdl: MdlFile) => {
       let normalBuffer: WebGLBuffer = null;
       let positionBuffer: WebGLBuffer = null;
-      let deltaBuffer: WebGLBuffer = null;
+      let positionDeltaBuffer: WebGLBuffer = null;
+      let normalDeltaBuffer: WebGLBuffer = null;
       let uvsBuffer: WebGLBuffer = null;
       let textures: WebGLTexture[] = [];
       let program: WebGLProgram = null;
@@ -118,8 +119,9 @@ enum OptionsRenderResolution {
         const selectedAnimation = animations[Object.keys(animations)[0]]; // animations["walk"];
 
         normalBuffer = createAttributeBuffer(gl, mdl.normals);
+        normalDeltaBuffer = createAttributeBuffer(gl, deltas.normals);
         positionBuffer = createAttributeBuffer(gl, mdl.positions);
-        deltaBuffer = createAttributeBuffer(gl, deltas);
+        positionDeltaBuffer = createAttributeBuffer(gl, deltas.positions);
         uvsBuffer = createAttributeBuffer(gl, mdl.uvs);
 
         state.modelFile = mdl;
@@ -205,16 +207,6 @@ enum OptionsRenderResolution {
               size: 3,
               type: gl.FLOAT,
             },
-            a_delta: {
-              buffer: deltaBuffer,
-              size: 3,
-              type: gl.FLOAT,
-            },
-            a_deltaNormal: {
-              buffer: normalBuffer,
-              size: 3,
-              type: gl.FLOAT,
-            },
             a_normal: {
               buffer: normalBuffer,
               size: 3,
@@ -223,6 +215,16 @@ enum OptionsRenderResolution {
             a_uv: {
               buffer: uvsBuffer,
               size: 2,
+              type: gl.FLOAT,
+            },
+            a_deltaPosition: {
+              buffer: positionDeltaBuffer,
+              size: 3,
+              type: gl.FLOAT,
+            },
+            a_deltaNormal: {
+              buffer: normalDeltaBuffer,
+              size: 3,
               type: gl.FLOAT,
             },
           });
@@ -283,7 +285,7 @@ enum OptionsRenderResolution {
 
           deleteBuffer(gl, normalBuffer);
           deleteBuffer(gl, positionBuffer);
-          deleteBuffer(gl, deltaBuffer);
+          deleteBuffer(gl, positionDeltaBuffer);
           deleteBuffer(gl, uvsBuffer);
 
           textures.forEach((texture) => deleteTexture(gl, texture));
