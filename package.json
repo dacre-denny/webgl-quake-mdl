@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "build": "webpack --mode production",
-    "dev": "webpack serve --progress --color"
+    "dev": "webpack serve --progress --color",
+    "deploy": "surge ./dist"
   },
   "devDependencies": {
     "@types/gl-matrix": "^3.2.0",
