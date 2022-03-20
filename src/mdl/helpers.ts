@@ -35,7 +35,8 @@ const notMdlExtractAnimation = (
  * @returns
  */
 export const buildFrameDeltas = (animations: MdlAnimations, mdl: any) => {
-  const deltas = new Float32Array(mdl.positions.length);
+  const positions = new Float32Array(mdl.positions.length);
+  const normals = new Float32Array(mdl.normals.length);
 
   for (const [from, to] of Object.values(animations)) {
     for (let frame = from; frame < to; frame++) {
@@ -54,14 +55,15 @@ export const buildFrameDeltas = (animations: MdlAnimations, mdl: any) => {
             const idxCurr = frameCurrIndex + idxCurrTri + vertex * 3 + i;
             const idxNext = frameNextIndex + idxCurrTri + vertex * 3 + i;
 
-            deltas[idxCurr] = mdl.positions[idxNext] - mdl.positions[idxCurr];
+            positions[idxCurr] = mdl.positions[idxNext] - mdl.positions[idxCurr];
+            normals[idxCurr] = mdl.normals[idxNext] - mdl.normals[idxCurr];
           }
         }
       }
     }
   }
 
-  return deltas;
+  return {positions, normals};
 };
 
 /**
